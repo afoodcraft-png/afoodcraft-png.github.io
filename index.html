@@ -348,10 +348,27 @@
         }
         .toast.show { transform: translateY(0); opacity: 1; }
 
+        /* MOBILE THEME TOGGLE (selalu tampil di mobile) */
+        .mobile-theme-btn {
+            display: none;
+            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--text); color: var(--bg);
+            border: none; font-size: 1.3rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            cursor: pointer;
+            align-items: center; justify-content: center;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .mobile-theme-btn:hover { transform: scale(1.1); }
+
         /* RESPONSIVE */
         @media (max-width: 900px) {
             nav { padding: 1.2rem 1.5rem; }
             .nav-links { display: none; }
+            .mobile-theme-btn { display: flex; }
+            body { cursor: auto; }
+            .cursor, .cursor-follower { display: none; }
             #hero, section { padding-left: 1.5rem; padding-right: 1.5rem; }
             #hero { padding-top: 7rem; }
             .about-grid, .cv-grid, .contact-grid { grid-template-columns: 1fr; }
@@ -364,6 +381,7 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-follower" id="cursor-follower"></div>
 <div class="toast" id="toast"></div>
+<button class="mobile-theme-btn" id="mobileThemeToggle" title="Ganti tema">🌙</button>
 
 <!-- NAV -->
 <nav>
@@ -580,11 +598,22 @@
     const html = document.documentElement;
     const saved = localStorage.getItem('theme') || 'dark';
     html.setAttribute('data-theme', saved);
-    document.getElementById('themeToggle').addEventListener('click', () => {
+
+    function updateMobileBtn() {
+        const btn = document.getElementById('mobileThemeToggle');
+        if (btn) btn.textContent = html.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    }
+    updateMobileBtn();
+
+    function toggleTheme() {
         const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         html.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
-    });
+        updateMobileBtn();
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.getElementById('mobileThemeToggle').addEventListener('click', toggleTheme);
 
     // ===== CURSOR =====
     const cursor = document.getElementById('cursor');
