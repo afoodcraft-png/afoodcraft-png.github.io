@@ -318,7 +318,7 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box {
-            position: relative; max-width: min(880px, 93vw); max-height: 90vh;
+            position: relative; width: min(1100px, 96vw); height: 92vh;
             background: var(--surface); border: 1px solid var(--border);
             overflow: hidden; display: flex; flex-direction: column;
             transform: translateY(24px) scale(0.97); transition: transform 0.3s ease;
@@ -330,6 +330,15 @@
         }
         .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: 0.08em; color: var(--text); }
         .modal-subtitle { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.1rem; }
+        .modal-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .modal-newtab {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.4rem 0.9rem; font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+            cursor: none; color: var(--text); border: 1.5px solid var(--border);
+            background: transparent; transition: border-color 0.2s, background 0.2s, color 0.2s;
+        }
+        .modal-newtab:hover { border-color: var(--text); background: var(--text); color: var(--bg); }
         .modal-close {
             width: 36px; height: 36px; border: 1.5px solid var(--border);
             background: transparent; color: var(--text); font-size: 1.1rem; cursor: none;
@@ -337,9 +346,9 @@
             transition: border-color 0.2s, background 0.2s, color 0.2s;
         }
         .modal-close:hover { border-color: var(--text); background: var(--text); color: var(--bg); }
-        .modal-body { overflow: auto; flex: 1; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
-        .modal-img { max-width: 100%; max-height: 70vh; object-fit: contain; display: block; }
-        .modal-pdf { width: 100%; height: 70vh; border: none; background: #fff; }
+        .modal-body { overflow: auto; flex: 1; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .modal-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; padding: 1.5rem; }
+        .modal-pdf { width: 100%; height: 100%; border: none; background: #fff; display: block; }
         .modal-placeholder {
             display: flex; flex-direction: column; align-items: center; gap: 1rem;
             color: var(--text-muted); text-align: center; padding: 2rem;
@@ -643,7 +652,10 @@
                 <div class="modal-title" id="modalTitle"></div>
                 <div class="modal-subtitle" id="modalSubtitle"></div>
             </div>
-            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-header-actions">
+                <a class="modal-newtab" id="modalNewTab" href="#" target="_blank" rel="noopener">↗ Buka Tab Baru</a>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
         </div>
         <div class="modal-body" id="modalBody"></div>
     </div>
@@ -654,11 +666,12 @@
     function openModal(title, subtitle, src, type) {
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalSubtitle').textContent = subtitle;
+        document.getElementById('modalNewTab').href = src || '#';
         const body = document.getElementById('modalBody');
         if (!src) {
             body.innerHTML = `<div class="modal-placeholder"><div class="modal-placeholder-icon">📂</div><p>File belum tersedia.</p></div>`;
         } else if (type === 'pdf') {
-            body.innerHTML = `<iframe class="modal-pdf" src="${src}#toolbar=0&navpanes=0" title="${title}"></iframe>`;
+            body.innerHTML = `<iframe class="modal-pdf" src="${src}" title="${title}"></iframe>`;
         } else {
             body.innerHTML = `<img class="modal-img" src="${src}" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'modal-placeholder\\'><div class=\\'modal-placeholder-icon\\'>🖼️</div><p>File <code>${src}</code> tidak ditemukan.<br>Upload ke folder yang sama dengan index.html.</p></div>'">`;
         }
