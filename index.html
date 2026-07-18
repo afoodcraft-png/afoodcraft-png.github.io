@@ -50,6 +50,10 @@
             transition: background 0.4s, color 0.4s;
         }
 
+        /* ===== LANGUAGE TOGGLE CSS ===== */
+        html[lang="en"] .lang-id { display: none !important; }
+        html[lang="id"] .lang-en { display: none !important; }
+
         /* CURSOR */
         .cursor {
             position: fixed; width: 10px; height: 10px;
@@ -98,13 +102,18 @@
         .nav-links a:hover { opacity: 1; }
         .nav-links a:hover::after { width: 100%; }
 
-        /* THEME TOGGLE */
-        .theme-toggle {
+        /* THEME & LANG TOGGLES */
+        .theme-toggle, .lang-toggle {
             display: flex; align-items: center; justify-content: center;
-            width: 42px; height: 23px; border-radius: 12px;
-            background: var(--border); border: none; cursor: none;
-            position: relative; transition: background 0.3s; flex-shrink: 0;
+            height: 23px; border-radius: 12px; border: none; cursor: none;
+            position: relative; transition: background 0.3s, color 0.3s; flex-shrink: 0;
         }
+        .theme-toggle { width: 42px; background: var(--border); }
+        .lang-toggle {
+            width: 38px; background: transparent; border: 1.5px solid var(--text);
+            color: var(--text); font-size: 0.65rem; font-weight: bold;
+        }
+        .lang-toggle:hover { background: var(--text); color: var(--bg); }
         .theme-toggle-knob {
             position: absolute; left: 3px; width: 17px; height: 17px;
             border-radius: 50%; background: var(--text);
@@ -205,14 +214,6 @@
             transition: border-color 0.4s;
         }
         .about-photo-wrap img { position: relative; z-index: 1; }
-        .about-photo-placeholder {
-            width: 100%; height: 100%; background: var(--surface2);
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 1rem; color: var(--text-subtle);
-            font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
-            position: relative; z-index: 1;
-        }
-        .about-photo-placeholder svg { width: 60px; height: 60px; opacity: 0.3; }
         .about-text h3 {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 2rem; letter-spacing: 0.05em; margin-bottom: 1rem; color: var(--text);
@@ -349,17 +350,6 @@
         .modal-body { overflow: auto; flex: 1; display: flex; align-items: center; justify-content: center; padding: 0; }
         .modal-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; padding: 1.5rem; }
         .modal-pdf { width: 100%; height: 100%; border: none; background: #fff; display: block; }
-        .modal-placeholder {
-            display: flex; flex-direction: column; align-items: center; gap: 1rem;
-            color: var(--text-muted); text-align: center; padding: 2rem;
-        }
-        .modal-placeholder-icon { font-size: 3rem; opacity: 0.4; }
-        .modal-placeholder p { font-size: 0.85rem; line-height: 1.7; max-width: 340px; }
-        .modal-placeholder code {
-            font-family: monospace; font-size: 0.8rem;
-            background: var(--surface2); padding: 0.2rem 0.5rem;
-            border: 1px solid var(--border); color: var(--text);
-        }
 
         /* CONTACT */
         #contact { background: var(--surface); }
@@ -422,25 +412,26 @@
         }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        /* MOBILE THEME TOGGLE (selalu tampil di mobile) */
-        .mobile-theme-btn {
-            display: none;
-            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+        /* MOBILE FLOATING BUTTONS */
+        .mobile-actions {
+            display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; 
+            z-index: 200; gap: 0.8rem; flex-direction: column;
+        }
+        .mobile-btn {
             width: 48px; height: 48px; border-radius: 50%;
             background: var(--text); color: var(--bg);
-            border: none; font-size: 1.3rem;
-            box-shadow: 0 4px 20px var(--shadow);
-            cursor: pointer;
-            align-items: center; justify-content: center;
+            border: none; font-size: 1.1rem; font-weight: bold;
+            box-shadow: 0 4px 20px var(--shadow); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             transition: background 0.3s, transform 0.2s;
         }
-        .mobile-theme-btn:hover { transform: scale(1.1); }
+        .mobile-btn:hover { transform: scale(1.1); }
 
         /* RESPONSIVE */
         @media (max-width: 900px) {
             nav { padding: 1.2rem 1.5rem; }
             .nav-links { display: none; }
-            .mobile-theme-btn { display: flex; }
+            .mobile-actions { display: flex; }
             body { cursor: auto; }
             .cursor, .cursor-follower { display: none; }
             #hero, section { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -455,19 +446,27 @@
 <div class="cursor" id="cursor"></div>
 <div class="cursor-follower" id="cursor-follower"></div>
 <div class="toast" id="toast"></div>
-<button class="mobile-theme-btn" id="mobileThemeToggle" title="Ganti tema">🌙</button>
+
+<!-- MOBILE BUTTONS -->
+<div class="mobile-actions">
+    <button class="mobile-btn" id="mobileLangToggle" title="Ganti bahasa / Change Language">EN</button>
+    <button class="mobile-btn" id="mobileThemeToggle" title="Ganti tema">🌙</button>
+</div>
 
 <!-- NAV -->
 <nav>
     <div class="nav-logo">M. AL FAROJI<span>.</span></div>
     <ul class="nav-links">
-        <li><a href="#about">Tentang</a></li>
-        <li><a href="#cv">CV</a></li>
+        <li><a href="#about"><span class="lang-id">Tentang</span><span class="lang-en">About</span></a></li>
+        <li><a href="#cv"><span class="lang-id">CV</span><span class="lang-en">Resume</span></a></li>
         <li><a href="#skills">Skills</a></li>
-        <li><a href="#certificates">Sertifikat</a></li>
-        <li><a href="#contact">Kontak</a></li>
+        <li><a href="#certificates"><span class="lang-id">Sertifikat</span><span class="lang-en">Certificates</span></a></li>
+        <li><a href="#contact"><span class="lang-id">Kontak</span><span class="lang-en">Contact</span></a></li>
         <li>
-            <button class="theme-toggle" id="themeToggle" title="Ganti tema">
+            <button class="lang-toggle" id="langToggle" title="Ganti bahasa / Change Language">EN</button>
+        </li>
+        <li>
+            <button class="theme-toggle" id="themeToggle" title="Ganti tema / Toggle theme">
                 <span class="t-icon t-sun">☀️</span>
                 <span class="t-icon t-moon">🌙</span>
                 <div class="theme-toggle-knob"></div>
@@ -482,15 +481,15 @@
     <div class="hero-content">
         <div class="hero-tag">✦ Fresh Graduate 2026</div>
         <h1 class="hero-name">
-            Halo,<br>
-            Saya <span class="highlight">M. AL</span><br>FAROJI
+            <span class="lang-id">Halo,<br>Saya</span><span class="lang-en">Hello,<br>I'm</span> <span class="highlight">M. AL</span><br>FAROJI
         </h1>
         <p class="hero-sub">
-            Fresh graduate TKJ yang memiliki minat pada Linux, networking, dan troubleshooting sistem. Berpengalaman melakukan instalasi, konfigurasi, dan pemecahan masalah pada sistem berbasis Linux serta aktif mempelajari web development dan cybersecurity dasar.
+            <span class="lang-id">Fresh graduate TKJ yang memiliki minat pada Linux, networking, dan troubleshooting sistem. Berpengalaman melakukan instalasi, konfigurasi, dan pemecahan masalah pada sistem berbasis Linux serta aktif mempelajari web development dan cybersecurity dasar.</span>
+            <span class="lang-en">A fresh IT Networking graduate with a strong interest in Linux, networking, and system troubleshooting. Experienced in installing, configuring, and troubleshooting Linux-based systems, while actively learning web development and basic cybersecurity.</span>
         </p>
         <div class="hero-cta">
-            <a href="#cv" class="btn btn-primary">Lihat CV Saya</a>
-            <a href="#contact" class="btn btn-outline">Hubungi Saya</a>
+            <a href="#cv" class="btn btn-primary"><span class="lang-id">Lihat CV Saya</span><span class="lang-en">View My Resume</span></a>
+            <a href="#contact" class="btn btn-outline"><span class="lang-id">Hubungi Saya</span><span class="lang-en">Contact Me</span></a>
         </div>
     </div>
     <div class="hero-scroll">
@@ -501,8 +500,8 @@
 
 <!-- ABOUT -->
 <section id="about">
-    <p class="section-label fade-up">✦ Tentang Saya</p>
-    <h2 class="section-title fade-up">Siapa<br>Saya?</h2>
+    <p class="section-label fade-up"><span class="lang-id">✦ Tentang Saya</span><span class="lang-en">✦ About Me</span></p>
+    <h2 class="section-title fade-up"><span class="lang-id">Siapa<br>Saya?</span><span class="lang-en">Who<br>Am I?</span></h2>
     <div class="divider fade-up"></div>
     <div class="about-grid">
         <div class="about-photo-wrap fade-up">
@@ -512,13 +511,21 @@
         </div>
         <div class="about-text fade-up">
             <h3>M. AL FAROJI</h3>
-            <p>Halo! Saya adalah fresh graduate dari SMK Widya Nusantara jurusan Teknik Jaringan, Komputer, dan Telekomunikasi. Aku memiliki minat yang besar dalam IT, dan selalu antusias untuk terus belajar hal baru.</p>
-            <p>Selama sekolah, saya aktif dalam berbagai organisasi dan proyek yang membantu aku mengasah kemampuan Linux & TroubleShooting. Aku percaya bahwa kombinasi teori dan praktik adalah kunci untuk menghasilkan karya yang bermakna.</p>
-            <p>Di luar itu, aku suka Ngulik Teknologi, Eksplor Sistem Kompleks, dan Customization. Seorang fast learner yang adaptif dan selalu optimis!</p>
+            <div class="lang-id">
+                <p>Halo! Saya adalah fresh graduate dari SMK Widya Nusantara jurusan Teknik Jaringan, Komputer, dan Telekomunikasi. Aku memiliki minat yang besar dalam IT, dan selalu antusias untuk terus belajar hal baru.</p>
+                <p>Selama sekolah, saya aktif dalam berbagai organisasi dan proyek yang membantu aku mengasah kemampuan Linux & TroubleShooting. Aku percaya bahwa kombinasi teori dan praktik adalah kunci untuk menghasilkan karya yang bermakna.</p>
+                <p>Di luar itu, aku suka Ngulik Teknologi, Eksplor Sistem Kompleks, dan Customization. Seorang fast learner yang adaptif dan selalu optimis!</p>
+            </div>
+            <div class="lang-en">
+                <p>Hello! I am a fresh graduate from SMK Widya Nusantara, majoring in Computer and Network Engineering. I have a huge passion for IT and am always enthusiastic about learning new things.</p>
+                <p>During my school years, I was active in various organizations and projects that helped me hone my Linux & Troubleshooting skills. I believe combining theory and practice is the key to producing meaningful work.</p>
+                <p>Outside of that, I enjoy tinkering with technology, exploring complex systems, and customization. I am an adaptive fast learner and always optimistic!</p>
+            </div>
+            
             <div class="about-stats">
-                <div><div class="stat-num" data-target="1">0</div><div class="stat-label">Proyek Selesai</div></div>
-                <div><div class="stat-num" data-target="4">0</div><div class="stat-label">Sertifikat</div></div>
-                <div><div class="stat-num" data-target="3">0</div><div class="stat-label">Tahun Belajar</div></div>
+                <div><div class="stat-num" data-target="1">0</div><div class="stat-label"><span class="lang-id">Proyek Selesai</span><span class="lang-en">Projects Done</span></div></div>
+                <div><div class="stat-num" data-target="4">0</div><div class="stat-label"><span class="lang-id">Sertifikat</span><span class="lang-en">Certificates</span></div></div>
+                <div><div class="stat-num" data-target="3">0</div><div class="stat-label"><span class="lang-id">Tahun Belajar</span><span class="lang-en">Years Learning</span></div></div>
             </div>
         </div>
     </div>
@@ -527,35 +534,44 @@
 <!-- CV -->
 <section id="cv">
     <p class="section-label fade-up">✦ Curriculum Vitae</p>
-    <h2 class="section-title fade-up">Pendidikan &<br>Pengalaman</h2>
+    <h2 class="section-title fade-up"><span class="lang-id">Pendidikan &<br>Pengalaman</span><span class="lang-en">Education &<br>Experience</span></h2>
     <div class="divider fade-up"></div>
-    <button class="cv-view-btn fade-up" onclick="openModal('Curriculum Vitae','M. AL FAROJI — Full CV','cv.pdf','pdf')">📄 Lihat CV Lengkap</button>
+    <button class="cv-view-btn fade-up" onclick="openModal('Curriculum Vitae','M. AL FAROJI — Full CV','cv.pdf','pdf')">📄 <span class="lang-id">Lihat CV Lengkap</span><span class="lang-en">View Full Resume</span></button>
     <div class="cv-grid fade-up">
         <div class="cv-col">
-            <h3>🎓 Pendidikan</h3>
+            <h3>🎓 <span class="lang-id">Pendidikan</span><span class="lang-en">Education</span></h3>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-date">2023 — 2026</div>
-                <div class="timeline-title">Teknik Jaringan, Komputer, dan Telekomunikasi</div>
+                <div class="timeline-title"><span class="lang-id">Teknik Jaringan, Komputer, dan Telekomunikasi</span><span class="lang-en">Computer and Network Engineering</span></div>
                 <div class="timeline-place">SMK Widya Nusantara, Kota Bekasi</div>
-                <div class="timeline-desc">Fokus pada jaringan komputer, sistem operasi Linux, dan pemrograman web. Aktif dalam kegiatan praktikum dan proyek sekolah.</div>
+                <div class="timeline-desc">
+                    <span class="lang-id">Fokus pada jaringan komputer, sistem operasi Linux, dan pemrograman web. Aktif dalam kegiatan praktikum dan proyek sekolah.</span>
+                    <span class="lang-en">Focused on computer networking, Linux operating systems, and web programming. Active in practical laboratory activities and school projects.</span>
+                </div>
             </div>
         </div>
         <div class="cv-col">
-            <h3>💼 Pengalaman</h3>
+            <h3>💼 <span class="lang-id">Pengalaman</span><span class="lang-en">Experience</span></h3>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
-                <div class="timeline-date">Mei 2025 — Juli 2025</div>
-                <div class="timeline-title">IT Support · Magang</div>
+                <div class="timeline-date"><span class="lang-id">Mei</span><span class="lang-en">May</span> 2025 — <span class="lang-id">Juli</span><span class="lang-en">July</span> 2025</div>
+                <div class="timeline-title">IT Support · <span class="lang-id">Magang</span><span class="lang-en">Internship</span></div>
                 <div class="timeline-place">PT Fajar Mas Murni, Kota Bekasi</div>
-                <div class="timeline-desc">Bertanggung jawab dalam perawatan perangkat keras, manajemen inventaris barang, serta TroubleShooting jaringan dan sistem untuk mendukung operasional perusahaan.</div>
+                <div class="timeline-desc">
+                    <span class="lang-id">Bertanggung jawab dalam perawatan perangkat keras, manajemen inventaris barang, serta TroubleShooting jaringan dan sistem untuk mendukung operasional perusahaan.</span>
+                    <span class="lang-en">Responsible for hardware maintenance, inventory management, and troubleshooting networks and systems to support company operations.</span>
+                </div>
             </div>
             <div class="timeline-item">
                 <div class="timeline-dot"></div>
                 <div class="timeline-date">2026</div>
-                <div class="timeline-title">Dotfiles untuk Arch Linux · Proyek Mandiri</div>
-                <div class="timeline-place">Proyek Mandiri</div>
-                <div class="timeline-desc">Membangun setup Linux yang efisien dengan konfigurasi dotfiles custom. Menghasilkan sistem kerja yang lebih produktif dan personal.</div>
+                <div class="timeline-title">Dotfiles untuk Arch Linux · <span class="lang-id">Proyek Mandiri</span><span class="lang-en">Personal Project</span></div>
+                <div class="timeline-place"><span class="lang-id">Proyek Mandiri</span><span class="lang-en">Personal Project</span></div>
+                <div class="timeline-desc">
+                    <span class="lang-id">Membangun setup Linux yang efisien dengan konfigurasi dotfiles custom. Menghasilkan sistem kerja yang lebih produktif dan personal.</span>
+                    <span class="lang-en">Built an efficient Linux setup with custom dotfiles configuration. Resulted in a more productive and personalized workflow system.</span>
+                </div>
             </div>
         </div>
     </div>
@@ -563,23 +579,23 @@
 
 <!-- SKILLS -->
 <section id="skills">
-    <p class="section-label fade-up">✦ Kemampuan</p>
-    <h2 class="section-title fade-up">Skill &<br>Keahlian</h2>
+    <p class="section-label fade-up"><span class="lang-id">✦ Kemampuan</span><span class="lang-en">✦ Abilities</span></p>
+    <h2 class="section-title fade-up"><span class="lang-id">Skill &<br>Keahlian</span><span class="lang-en">Skills &<br>Expertise</span></h2>
     <div class="divider fade-up"></div>
     <div class="skills-grid fade-up">
         <div class="skill-card"><div class="skill-icon">💻</div><div class="skill-name">Linux & Terminal</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="85"></div></div><div class="skill-pct">85%</div></div>
         <div class="skill-card"><div class="skill-icon">⚙️</div><div class="skill-name">TroubleShooting Sistem</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="82"></div></div><div class="skill-pct">82%</div></div>
         <div class="skill-card"><div class="skill-icon">🌐</div><div class="skill-name">Web Programming (HTML, CSS, JS, PHP, MySQL)</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="72"></div></div><div class="skill-pct">72%</div></div>
         <div class="skill-card"><div class="skill-icon">📊</div><div class="skill-name">Git & Github</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="78"></div></div><div class="skill-pct">78%</div></div>
-        <div class="skill-card"><div class="skill-icon">🔌</div><div class="skill-name">Dasar Jaringan Komputer</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div><div class="skill-pct">75%</div></div>
+        <div class="skill-card"><div class="skill-icon">🔌</div><div class="skill-name"><span class="lang-id">Dasar Jaringan Komputer</span><span class="lang-en">Computer Networking Basics</span></div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="75"></div></div><div class="skill-pct">75%</div></div>
         <div class="skill-card"><div class="skill-icon">🔧</div><div class="skill-name">Technical Problem Solving</div><div class="skill-bar-track"><div class="skill-bar-fill" data-width="88"></div></div><div class="skill-pct">88%</div></div>
     </div>
 </section>
 
 <!-- CERTIFICATES -->
 <section id="certificates">
-    <p class="section-label fade-up">✦ Sertifikat</p>
-    <h2 class="section-title fade-up">Pencapaian &<br>Sertifikasi</h2>
+    <p class="section-label fade-up"><span class="lang-id">✦ Sertifikat</span><span class="lang-en">✦ Certificates</span></p>
+    <h2 class="section-title fade-up"><span class="lang-id">Pencapaian &<br>Sertifikasi</span><span class="lang-en">Achievements &<br>Certifications</span></h2>
     <div class="divider fade-up"></div>
     <div class="cert-grid fade-up">
         <div class="cert-card">
@@ -587,57 +603,75 @@
             <div class="cert-icon">🏆</div>
             <div class="cert-title">Web Program Training</div>
             <div class="cert-issuer">PS Techno Company</div>
-            <div class="cert-date">Februari 2026</div>
-            <div class="cert-desc">Menyelesaikan pelatihan Web Programming meliputi HTML, CSS, JavaScript, PHP, dan MySQL serta membuat sistem registrasi, login, dan logout.</div>
-            <button class="cert-view-btn" onclick="openModal('Web Program Training','PS Techno Company · Februari 2026','cert-webprogram.jpg','img')">🔍 Lihat Sertifikat</button>
+            <div class="cert-date"><span class="lang-id">Februari</span><span class="lang-en">February</span> 2026</div>
+            <div class="cert-desc">
+                <span class="lang-id">Menyelesaikan pelatihan Web Programming meliputi HTML, CSS, JavaScript, PHP, dan MySQL serta membuat sistem registrasi, login, dan logout.</span>
+                <span class="lang-en">Completed Web Programming training covering HTML, CSS, JavaScript, PHP, and MySQL, including building a registration, login, and logout system.</span>
+            </div>
+            <button class="cert-view-btn" onclick="openModal('Web Program Training','PS Techno Company · Februari 2026','cert-webprogram.jpg','img')">🔍 <span class="lang-id">Lihat Sertifikat</span><span class="lang-en">View Certificate</span></button>
         </div>
         <div class="cert-card">
             <div class="cert-ribbon">2026</div>
             <div class="cert-icon">📜</div>
-            <div class="cert-title">Cyber Security Dasar</div>
+            <div class="cert-title"><span class="lang-id">Cyber Security Dasar</span><span class="lang-en">Basic Cyber Security</span></div>
             <div class="cert-issuer">ID-Networkers</div>
-            <div class="cert-date">Mei 2026</div>
-            <div class="cert-desc">Mempelajari dasar dasar cybersecurity</div>
-            <button class="cert-view-btn" onclick="openModal('Cyber Security Dasar','ID-Networkers · Mei 2026','cert-cybersec.jpg','img')">🔍 Lihat Sertifikat</button>
+            <div class="cert-date"><span class="lang-id">Mei</span><span class="lang-en">May</span> 2026</div>
+            <div class="cert-desc">
+                <span class="lang-id">Mempelajari dasar dasar cybersecurity.</span>
+                <span class="lang-en">Studied the fundamentals of cybersecurity.</span>
+            </div>
+            <button class="cert-view-btn" onclick="openModal('Cyber Security Dasar','ID-Networkers · Mei 2026','cert-cybersec.jpg','img')">🔍 <span class="lang-id">Lihat Sertifikat</span><span class="lang-en">View Certificate</span></button>
         </div>
         <div class="cert-card">
             <div class="cert-ribbon">2026</div>
             <div class="cert-icon">📑</div>
             <div class="cert-title">Linux Essentials</div>
             <div class="cert-issuer">Cisco Networking Academy program</div>
-            <div class="cert-date">Juni 2026</div>
-            <div class="cert-desc">Belajar dasar sistem operasi, perintah terminal, administrasi, dan keamanan Linux.</div>
-            <button class="cert-view-btn" onclick="openModal('Linux Essentials','Cisco Networking Academy program · Juni 2026','cert-Linux-Essentials.jpg','img')">🔍 Lihat Sertifikat</button>
+            <div class="cert-date"><span class="lang-id">Juni</span><span class="lang-en">June</span> 2026</div>
+            <div class="cert-desc">
+                <span class="lang-id">Belajar dasar sistem operasi, perintah terminal, administrasi, dan keamanan Linux.</span>
+                <span class="lang-en">Learned basic operating systems, terminal commands, administration, and Linux security.</span>
+            </div>
+            <button class="cert-view-btn" onclick="openModal('Linux Essentials','Cisco Networking Academy program · Juni 2026','cert-Linux-Essentials.jpg','img')">🔍 <span class="lang-id">Lihat Sertifikat</span><span class="lang-en">View Certificate</span></button>
         </div>
          <div class="cert-card">
             <div class="cert-ribbon">2026</div>
             <div class="cert-icon">🧾</div>
-            <div class="cert-title">Belajar Linux dari Nol+</div>
+            <div class="cert-title"><span class="lang-id">Belajar Linux dari Nol+</span><span class="lang-en">Learning Linux from Zero+</span></div>
             <div class="cert-issuer">ID-Networkers</div>
-            <div class="cert-date">Juni 2026</div>
-            <div class="cert-desc">Mempelajari dasar dasar Linux</div>
-            <button class="cert-view-btn" onclick="openModal('Belajar Linux dari Nol+','ID-Networkers · Juni 2026','cert-Linux.jpg','img')">🔍 Lihat Sertifikat</button>
+            <div class="cert-date"><span class="lang-id">Juni</span><span class="lang-en">June</span> 2026</div>
+            <div class="cert-desc">
+                <span class="lang-id">Mempelajari dasar dasar Linux.</span>
+                <span class="lang-en">Studied the fundamentals of Linux.</span>
+            </div>
+            <button class="cert-view-btn" onclick="openModal('Belajar Linux dari Nol+','ID-Networkers · Juni 2026','cert-Linux.jpg','img')">🔍 <span class="lang-id">Lihat Sertifikat</span><span class="lang-en">View Certificate</span></button>
         </div>
         <div class="cert-card">
             <div class="cert-ribbon">2026</div>
             <div class="cert-icon">📚</div>
-            <div class="cert-title">Sertifikat Uji Kompetensi</div>
+            <div class="cert-title"><span class="lang-id">Sertifikat Uji Kompetensi</span><span class="lang-en">Competency Test Certificate</span></div>
             <div class="cert-issuer">CyberPlus</div>
-            <div class="cert-date">Mei 2026</div>
-            <div class="cert-desc">Mennguji Pengetahuan tentang jaringan dan mempraktikannya</div>
-            <button class="cert-view-btn" onclick="openModal('Sertifikat Uji Kompetensi','CyberPlus · Mei 2026','cert-ukom.jpg','img')">🔍 Lihat Sertifikat</button>
+            <div class="cert-date"><span class="lang-id">Mei</span><span class="lang-en">May</span> 2026</div>
+            <div class="cert-desc">
+                <span class="lang-id">Menguji Pengetahuan tentang jaringan dan mempraktikannya.</span>
+                <span class="lang-en">Tested knowledge about networks and practical applications.</span>
+            </div>
+            <button class="cert-view-btn" onclick="openModal('Sertifikat Uji Kompetensi','CyberPlus · Mei 2026','cert-ukom.jpg','img')">🔍 <span class="lang-id">Lihat Sertifikat</span><span class="lang-en">View Certificate</span></button>
         </div>
     </div>
 </section>
 
 <!-- CONTACT -->
 <section id="contact">
-    <p class="section-label fade-up">✦ Kontak</p>
+    <p class="section-label fade-up"><span class="lang-id">✦ Kontak</span><span class="lang-en">✦ Contact</span></p>
     <h2 class="section-title fade-up">Let's<br>Connect!</h2>
     <div class="divider fade-up"></div>
     <div class="contact-grid fade-up">
         <div class="contact-info">
-            <p>Saya terbuka untuk peluang kerja, kolaborasi proyek, atau sekadar ngobrol! Jangan ragu untuk menghubungi saya.</p>
+            <p>
+                <span class="lang-id">Saya terbuka untuk peluang kerja, kolaborasi proyek, atau sekadar ngobrol! Jangan ragu untuk menghubungi saya.</span>
+                <span class="lang-en">I am open to job opportunities, project collaborations, or just chatting! Don't hesitate to contact me.</span>
+            </p>
             <div class="contact-links">
                 <a href="mailto:m.alfaroji67@gmail.com" class="contact-link"><span class="contact-link-icon">📧</span><span>m.alfaroji67@gmail.com</span></a>
                 <a href="https://linkedin.com/in/m-alfaroji-51b93b322/" class="contact-link" target="_blank"><span class="contact-link-icon">💼</span><span>linkedin.com/in/m-alfaroji</span></a>
@@ -648,18 +682,20 @@
         <div>
             <div class="contact-form">
                 <div class="form-group">
-                    <label>Nama</label>
-                    <input type="text" placeholder="Nama kamu" id="formName"/>
+                    <label><span class="lang-id">Nama</span><span class="lang-en">Name</span></label>
+                    <input type="text" placeholder="John Doe" id="formName"/>
                 </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" placeholder="email@contoh.com" id="formEmail"/>
                 </div>
                 <div class="form-group">
-                    <label>Pesan</label>
-                    <textarea rows="5" placeholder="Tulis pesanmu di sini..." id="formMsg"></textarea>
+                    <label><span class="lang-id">Pesan</span><span class="lang-en">Message</span></label>
+                    <textarea rows="5" placeholder="..." id="formMsg"></textarea>
                 </div>
-                <button class="btn-send" id="sendBtn" onclick="handleSend()">Kirim Pesan →</button>
+                <button class="btn-send" id="sendBtn" onclick="handleSend()">
+                    <span class="lang-id">Kirim Pesan →</span><span class="lang-en">Send Message →</span>
+                </button>
             </div>
         </div>
     </div>
@@ -668,7 +704,10 @@
 <!-- FOOTER -->
 <footer>
     <span>© 2026 <b>M. AL FAROJI</b>. All rights reserved.</span>
-    <span>Dibuat dengan ❤️ & HTML/CSS/JS</span>
+    <span>
+        <span class="lang-id">Dibuat dengan ❤️ & HTML/CSS/JS</span>
+        <span class="lang-en">Made with ❤️ & HTML/CSS/JS</span>
+    </span>
 </footer>
 
 <!-- MODAL -->
@@ -680,7 +719,9 @@
                 <div class="modal-subtitle" id="modalSubtitle"></div>
             </div>
             <div class="modal-header-actions">
-                <a class="modal-newtab" id="modalNewTab" href="#" target="_blank" rel="noopener">↗ Buka Tab Baru</a>
+                <a class="modal-newtab" id="modalNewTab" href="#" target="_blank" rel="noopener">
+                    <span class="lang-id">↗ Buka Tab Baru</span><span class="lang-en">↗ Open in New Tab</span>
+                </a>
                 <button class="modal-close" onclick="closeModal()">✕</button>
             </div>
         </div>
@@ -695,12 +736,13 @@
         document.getElementById('modalSubtitle').textContent = subtitle;
         document.getElementById('modalNewTab').href = src || '#';
         const body = document.getElementById('modalBody');
+        const isEn = document.documentElement.getAttribute('lang') === 'en';
         if (!src) {
-            body.innerHTML = `<div class="modal-placeholder"><div class="modal-placeholder-icon">📂</div><p>File belum tersedia.</p></div>`;
+            body.innerHTML = `<div class="modal-placeholder"><div class="modal-placeholder-icon">📂</div><p>${isEn ? 'File not available.' : 'File belum tersedia.'}</p></div>`;
         } else if (type === 'pdf') {
             body.innerHTML = `<iframe class="modal-pdf" src="${src}" title="${title}"></iframe>`;
         } else {
-            body.innerHTML = `<img class="modal-img" src="${src}" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'modal-placeholder\\'><div class=\\'modal-placeholder-icon\\'>🖼️</div><p>File <code>${src}</code> tidak ditemukan.<br>Upload ke folder yang sama dengan index.html.</p></div>'">`;
+            body.innerHTML = `<img class="modal-img" src="${src}" alt="${title}" onerror="this.parentElement.innerHTML='<div class=\\'modal-placeholder\\'><div class=\\'modal-placeholder-icon\\'>🖼️</div><p>${isEn ? 'File <code>' + src + '</code> not found.' : 'File <code>' + src + '</code> tidak ditemukan.'}</p></div>'">`;
         }
         document.getElementById('docModal').classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -721,21 +763,30 @@
         const email = document.getElementById('formEmail').value.trim();
         const msg  = document.getElementById('formMsg').value.trim();
         const btn  = document.getElementById('sendBtn');
-        if (!name || !email || !msg) { showToast('⚠ Isi semua field terlebih dahulu!', false); return; }
-        btn.textContent = 'Mengirim...'; btn.disabled = true;
+        const isEn = document.documentElement.getAttribute('lang') === 'en';
+        
+        if (!name || !email || !msg) { 
+            showToast(isEn ? '⚠ Please fill out all fields!' : '⚠ Isi semua field terlebih dahulu!', false); 
+            return; 
+        }
+        
+        const btnOriginalHTML = btn.innerHTML;
+        btn.textContent = isEn ? 'Sending...' : 'Mengirim...'; 
+        btn.disabled = true;
         try {
             await emailjs.send('service_6sq66fa', 'template_ilpw5ui', {
                 from_name: name, from_email: email, message: msg, title: 'Pesan dari Portofolio'
             });
-            showToast('✓ Pesan berhasil dikirim ke Gmail!', true);
+            showToast(isEn ? '✓ Message sent successfully!' : '✓ Pesan berhasil dikirim ke Gmail!', true);
             document.getElementById('formName').value = '';
             document.getElementById('formEmail').value = '';
             document.getElementById('formMsg').value = '';
         } catch(err) {
-            showToast('✗ Gagal mengirim, coba lagi.', false);
+            showToast(isEn ? '✗ Failed to send, please try again.' : '✗ Gagal mengirim, coba lagi.', false);
             console.error(err);
         }
-        btn.textContent = 'Kirim Pesan →'; btn.disabled = false;
+        btn.innerHTML = btnOriginalHTML; 
+        btn.disabled = false;
     }
 
     function showToast(msg, success) {
@@ -749,8 +800,8 @@
 
     // ===== THEME TOGGLE =====
     const html = document.documentElement;
-    const saved = localStorage.getItem('theme') || 'dark';
-    html.setAttribute('data-theme', saved);
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
 
     function updateMobileBtn() {
         const btn = document.getElementById('mobileThemeToggle');
@@ -767,6 +818,30 @@
 
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('mobileThemeToggle').addEventListener('click', toggleTheme);
+    
+    // ===== LANGUAGE TOGGLE =====
+    const savedLang = localStorage.getItem('lang') || 'id';
+    html.setAttribute('lang', savedLang);
+    
+    function updateLangBtnText() {
+        const current = html.getAttribute('lang');
+        const deskBtn = document.getElementById('langToggle');
+        const mobBtn = document.getElementById('mobileLangToggle');
+        // Jika sedang 'id', tombol menawarkan ganti ke 'EN', begitu juga sebaliknya
+        if(deskBtn) deskBtn.textContent = current === 'id' ? 'EN' : 'ID';
+        if(mobBtn) mobBtn.textContent = current === 'id' ? 'EN' : 'ID';
+    }
+    updateLangBtnText();
+    
+    function toggleLanguage() {
+        const next = html.getAttribute('lang') === 'id' ? 'en' : 'id';
+        html.setAttribute('lang', next);
+        localStorage.setItem('lang', next);
+        updateLangBtnText();
+    }
+    
+    document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+    document.getElementById('mobileLangToggle').addEventListener('click', toggleLanguage);
 
     // ===== CURSOR =====
     const cursor = document.getElementById('cursor');
