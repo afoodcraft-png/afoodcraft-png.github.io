@@ -1033,21 +1033,26 @@
     }, { threshold: 0.3 });
     document.querySelectorAll('#skills').forEach(el => barObserver.observe(el));
 
-    // ===== COUNT UP =====
-    const statsObserver = new IntersectionObserver(entries => {
+    // ===== COUNT UP ===== (FIXED)
+    const statsObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.querySelectorAll('.stat-num[data-target]').forEach(num => {
-                const target = parseInt(num.dataset.target); let cur = 0;
+            if (entry.isIntersecting) {
+                const num = entry.target;
+                const target = parseInt(num.dataset.target); 
+                let cur = 0;
                 const step = Math.ceil(target / 40);
                 const iv = setInterval(() => {
                     cur = Math.min(cur + step, target);
                     num.textContent = cur + (cur === target ? '+' : '');
                     if (cur >= target) clearInterval(iv);
                 }, 40);
-            });
+                // Berhenti mengamati setelah elemen muncul (agar tidak ngeloop)
+                observer.unobserve(num);
+            }
         });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('#about').forEach(el => statsObserver.observe(el));
+    }, { threshold: 0.1 }); // Menggunakan threshold lebih rendah agar mudah ke-trigger
+    
+    document.querySelectorAll('.stat-num[data-target]').forEach(el => statsObserver.observe(el));
 
     // ===== ACTIVE NAV =====
     const sections = document.querySelectorAll('section[id]');
