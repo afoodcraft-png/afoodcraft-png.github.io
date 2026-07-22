@@ -502,6 +502,54 @@
             z-index: 1;
         }
 
+        /* ===== EASTER EGG TERMINAL CSS ===== */
+        .terminal-overlay {
+            position: fixed; inset: 0; z-index: 9995;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .terminal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .terminal-window {
+            width: min(750px, 92vw); height: 500px; max-height: 85vh;
+            background: #111111; border: 1px solid #333;
+            border-radius: 8px; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transform: translateY(20px) scale(0.98); transition: transform 0.3s ease;
+            font-family: 'Courier New', Courier, monospace; /* Mono font khusus terminal */
+        }
+        .terminal-overlay.active .terminal-window { transform: translateY(0) scale(1); }
+
+        .terminal-header {
+            background: #1e1e1e; padding: 8px 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #333; user-select: none;
+        }
+        .terminal-title { color: #cccccc; font-size: 0.85rem; font-weight: bold; }
+        .terminal-actions { display: flex; gap: 8px; }
+        .term-btn { width: 14px; height: 14px; border-radius: 50%; border: none; cursor: pointer; }
+        .term-close { background: #ff5f56; }
+        .term-close:hover { background: #e0443c; }
+        .term-min { background: #ffbd2e; cursor: default; }
+        .term-max { background: #27c93f; cursor: default; }
+
+        .terminal-body {
+            padding: 15px; flex: 1; overflow-y: auto; color: #f0f0f0;
+            font-size: 0.9rem; line-height: 1.5;
+        }
+        .terminal-body::-webkit-scrollbar { width: 8px; }
+        .terminal-body::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+        .term-input-line { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+        .term-prompt { color: #27c93f; font-weight: bold; white-space: nowrap; }
+        #termInput {
+            background: transparent; border: none; color: #f0f0f0;
+            font-family: 'Courier New', Courier, monospace; font-size: 0.9rem;
+            flex: 1; outline: none; caret-color: #f0f0f0;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 900px) {
             nav { padding: 1.2rem 1.5rem; }
@@ -865,7 +913,31 @@
     </div>
     <img src="nazuna.png" alt="Waifu" id="waifu-img" onerror="this.src='https://dummyimage.com/250x300/1f1f1f/f0f0f0.png&text=Nazuna+PNG'">
 </div>
-
+<!-- EASTER EGG TERMINAL -->
+<div class="terminal-overlay" id="terminalModal" onclick="handleTerminalBgClick(event)">
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <div class="terminal-title">m.alfaroji@archlinux: ~</div>
+            <div class="terminal-actions">
+                <button class="term-btn term-min"></button>
+                <button class="term-btn term-max"></button>
+                <button class="term-btn term-close" onclick="closeTerminal()" title="Tutup Terminal"></button>
+            </div>
+        </div>
+        <div class="terminal-body" id="terminalBody" onclick="document.getElementById('termInput').focus()">
+            <div id="termOutput">
+                <div style="margin-bottom: 15px; color: var(--text-muted);">
+                    Welcome to AlfarojiOS.<br>
+                    Type 'help' to see the list of available commands.
+                </div>
+            </div>
+            <div class="term-input-line">
+                <span class="term-prompt">[alfaroji@archlinux ~]$</span>
+                <input type="text" id="termInput" autocomplete="off" spellcheck="false" />
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     // ===== MODAL =====
     function openModal(title, subtitle, src, type) {
@@ -1062,6 +1134,165 @@
         sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
         navLinks.forEach(a => { a.style.opacity = a.getAttribute('href') === '#' + current ? '1' : '0.5'; });
     });
+    // ===== TERMINAL EASTER EGG LOGIC =====
+    const termModal = document.getElementById('terminalModal');
+    const termInput = document.getElementById('termInput');
+    const termOutput = document.getElementById('termOutput');
+
+    // Shortcut: Ctrl + Alt + T
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.altKey && (e.key === 't' || e.key === 'T')) {
+            e.preventDefault();
+            toggleTerminal();
+        }
+    });
+
+    function toggleTerminal() {
+        if (termModal.classList.contains('active')) {
+            closeTerminal();
+        } else {
+            termModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            termInput.value = '';
+            setTimeout(() => termInput.focus(), 100);
+            
+            const isEn = document.documentElement.getAttribute('lang') === 'en';
+            showToast(isEn ? 'Terminal unlocked! (Ctrl+Alt+T)' : 'Terminal terbuka! (Ctrl+Alt+T)', true);
+        }
+    }
+
+    function closeTerminal() {
+        termModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function handleTerminalBgClick(e) { 
+        if (e.target === termModal) closeTerminal(); 
+    }
+
+    // Handle Execute Command
+    termInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value.trim();
+            if (cmd) processCommand(cmd);
+            this.value = '';
+        }
+    });
+
+    function processCommand(cmd) {
+        // Echo command
+        const echoLine = document.createElement('div');
+        echoLine.innerHTML = `<span class="term-prompt">[alfaroji@archlinux ~]$</span> ${cmd}`;
+        termOutput.appendChild(echoLine);
+
+        // Process response
+        const resLine = document.createElement('div');
+        resLine.style.marginBottom = '10px';
+        
+        const args = cmd.toLowerCase().split(' ');
+        const main = args[0];
+
+        switch(main) {
+            case 'help':
+                resLine.innerHTML = `
+                    Available commands:<br>
+                    <b style="color:#56b6c2">help</b>       - Show this help message<br>
+                    <b style="color:#56b6c2">whoami</b>     - Display current user<br>
+                    <b style="color:#56b6c2">fastfetch</b>  - Display system information<br>
+                    <b style="color:#56b6c2">clear</b>      - Clear the terminal screen<br>
+                    <b style="color:#56b6c2">theme</b>      - Toggle website theme (e.g., 'theme dark', 'theme light')<br>
+                    <b style="color:#56b6c2">sudo</b>       - Execute a command as superuser<br>
+                    <b style="color:#56b6c2">exit</b>       - Close the terminal
+                `;
+                break;
+            case 'whoami':
+                resLine.innerHTML = "m.alfaroji<br>IT Support | Linux & Networking Enthusiast";
+                break;
+            case 'neofetch':
+            case 'fastfetch':
+                const themeNow = document.documentElement.getAttribute('data-theme') === 'dark' ? 'Dark' : 'Light';
+                resLine.innerHTML = `
+<div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+<pre style="color: #1793d1; margin: 0; line-height: 1.15; font-weight: bold;">
+                   -
+                  .o+\`
+                 \`ooo/
+                \`+oooo:
+               \`+oooooo:
+               -+oooooo+:
+             \`/:-:++oooo+:
+            \`/++++/+++++++:
+           \`/++++++++++++++:
+          \`/+++ooooooooooooo/\`
+         ./ooosssso++osssssso+\`
+        .oossssso-\`\`\`\`/ossssss+\`
+       -osssssso.      :ssssssso.
+      :osssssss/        osssso+++.
+     /ossssssss/        +ssssooo/-
+   \`/ossssso+/:-        -:/+osssso+-
+  \`+sso+:-\`                 \`.-/+oso:
+ \`++:.                           \`-/+/
+ .\`                                 \`/
+</pre>
+<div>
+    <b style="color:#1793d1">alfaroji</b>@<b style="color:#1793d1">archlinux</b><br>
+    -------------------------<br>
+    <b style="color:#56b6c2">OS</b>: Arch Linux x86_64<br>
+    <b style="color:#56b6c2">Host</b>: M. AL FAROJI Web Portfolio<br>
+    <b style="color:#56b6c2">Kernel</b>: 6.8.0-arch1-1<br>
+    <b style="color:#56b6c2">Uptime</b>: 99 days, 24 hours<br>
+    <b style="color:#56b6c2">Packages</b>: 1337 (pacman)<br>
+    <b style="color:#56b6c2">Shell</b>: bash 5.1.16<br>
+    <b style="color:#56b6c2">Theme</b>: ${themeNow}<br>
+    <b style="color:#56b6c2">Terminal</b>: WebTerm<br>
+    <div style="margin-top:5px;">
+        <span style="display:inline-block; width:12px; height:12px; background:#000;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#ff5f56;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#27c93f;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#ffbd2e;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#1793d1;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#b48ead;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#56b6c2;"></span>
+        <span style="display:inline-block; width:12px; height:12px; background:#f0f0f0;"></span>
+    </div>
+</div>
+</div>`;
+                break;
+            case 'clear':
+                termOutput.innerHTML = '';
+                return; 
+            case 'theme':
+                if (args[1] === 'dark' || args[1] === 'light') {
+                    if (document.documentElement.getAttribute('data-theme') !== args[1]) {
+                        toggleTheme();
+                        resLine.innerHTML = `Switched website theme to <b>${args[1]}</b> mode.`;
+                    } else {
+                        resLine.innerHTML = `Theme is already on ${args[1]} mode.`;
+                    }
+                } else {
+                    toggleTheme();
+                    const newT = document.documentElement.getAttribute('data-theme');
+                    resLine.innerHTML = `Toggled theme to <b>${newT}</b>.`;
+                }
+                break;
+            case 'sudo':
+                resLine.innerHTML = `[sudo] password for alfaroji:<br>alfaroji is not in the sudoers file. This incident will be reported.`;
+                resLine.style.color = "#ff5f56";
+                break;
+            case 'exit':
+                closeTerminal();
+                return;
+            default:
+                resLine.innerHTML = `bash: ${main}: command not found`;
+                resLine.style.color = "#ff5f56";
+        }
+
+        termOutput.appendChild(resLine);
+        
+        // Auto scroll to bottom
+        const termBody = document.getElementById('terminalBody');
+        termBody.scrollTop = termBody.scrollHeight;
+    }
 </script>
 </body>
 </html>
