@@ -565,6 +565,18 @@
             #waifu-img { height: 220px; }
             .waifu-speech { margin-bottom: 140px; }
         }
+
+        /* Penyesuaian Terminal di Mobile */
+        .terminal-window {
+            height: 60vh; /* Mengurangi tinggi agar tidak tertutup virtual keyboard */
+            max-height: 400px;
+        }
+        .terminal-body {
+            font-size: 0.75rem; /* Teks sedikit lebih kecil agar muat banyak */
+        }
+        #termInput {
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body>
@@ -575,6 +587,9 @@
 
 <!-- MOBILE BUTTONS -->
 <div class="mobile-actions">
+    <!-- Tombol Terminal Baru -->
+    <button class="mobile-btn" id="mobileTerminalToggle" title="Buka Terminal">💻</button>
+    
     <button class="mobile-btn" id="mobileLangToggle" title="Ganti bahasa / Change Language">EN</button>
     <button class="mobile-btn" id="mobileThemeToggle" title="Ganti tema">🌙</button>
 </div>
@@ -1027,6 +1042,11 @@
 
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     document.getElementById('mobileThemeToggle').addEventListener('click', toggleTheme);
+    // Trigger Terminal untuk Mobile
+    const mobileTermBtn = document.getElementById('mobileTerminalToggle');
+    if (mobileTermBtn) {
+        mobileTermBtn.addEventListener('click', toggleTerminal);
+    }
     
     // ===== LANGUAGE TOGGLE =====
     const savedLang = localStorage.getItem('lang') || 'id';
